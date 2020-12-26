@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <script type="text/javascript "th:src="@{/functions.js}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"></head>
+<body>
+<h1>Add students</h1>
+    <form id="studentForm" style="padding-left: 50px">
+        <table>
+            <tr>
+                <td>Full name</td>
+                <td><input type="text" id="studentName1" placeholder="Full Name"></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><input type="text" id="studentEmail1" placeholder="Email"></td>
+            </tr>
+            <tr>
+                <td>Supervisor</td>
+                <td>
+                <select id="supervisorIdSelected">
+                    <option
+                            th:each="supervisor : ${supervisorList}"
+                            th:value="${supervisor.id}"
+                            th:text="${supervisor.name}"
+                    ></option>
+                </select>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Create Student">
+    </form>
+    <table class="table" id="table">
+        <thead class="thead">
+        <th>Student Name</th>
+        <th>Student Email</th>
+        <th>Supervisor</th>
+        <th>Delete</th>
+        <th>Opdatér</th>
+        </thead>
+    </table>
+</body>
+<script type="text/javascript">
+    getStudents();
+    preventCreateStudentForSending($("#studentForm"));
+</script>
+</html>
