@@ -29,7 +29,7 @@ public class StudentController {
 
     @PostMapping("api/createStudent")
     public ResponseEntity<Student> createStudent(@RequestBody Student student){
-        /*for (int i = 0; i < 1000; i++) {
+        /*for (int i = 0; i < 10; i++) {
             Supervisor supervisor = supervisorService.findById((long) 1).get();
             Student student1 = new Student(0, "lars", "oleLuk", supervisor);
             studentService.save(student1);

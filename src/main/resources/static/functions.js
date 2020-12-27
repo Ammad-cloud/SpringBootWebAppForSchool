@@ -1,15 +1,12 @@
-var studentIDGlobal; //global value due to onclick attribute
-
-function addStudentToHTML(student){
-    studentIDGlobal = student.id
-        $('<tr>').append(
-        $("<td id='name'><input type='text' value=" + student.name +  ">"),
-        $("<td id='email'><input type='text' value=" + student.email +  ">"),
-        $("<td id='supervisorName'><input type='text' value='" + student.supervisor.name +  "'>"), //supervisor name is put into a string because the name can contain whitespace
-        $("<button type='submit' onclick='deleteStudent(this.value)' value=" + student.id + ">" + "Slet</button>"),
-        $("<button type='submit' onclick='updateStudent(this.value)' value=" + student.id + ">" + "Opdatér</button>"),
-        $("<td id='supervisorId'><input type='hidden' value='" + student.supervisor.id +  "'>"),
-        $("<td id='studentId'><input type='hidden' id='studentId' value=" + student.id +  ">"), // added to identify on edit
+function addStudentToHTMLDOM(student){
+    $('<tr>').append(
+    $("<td><input name='studentName' type='text' value='" + student.name + "'>"), //value is put into string because name can contain whitespace
+    $("<td><input name='studentEmail' type='text' value=" + student.email +  ">"),
+    $("<td><input name='supervisorName' type='text' value='" + student.supervisor.name +  "'>"), //supervisor name is put into a string because the name can contain whitespace
+    $("<button type='submit' onclick='deleteStudent(this.value)' value=" + student.id + ">" + "Slet</button>"),
+    $("<button type='submit' onclick='updateStudent(this.value)' value=" + student.id + ">" + "Opdatér</button>"),
+    $("<td><input name='supervisorId' type='hidden' value='" + student.supervisor.id +  "'>"),
+    $("<td type='hidden' id='studentId' value=" + student.id +  ">") // not used but added to function as a student identifier for convenience purposes in future
     ).appendTo('#table');
 }
 
@@ -21,7 +18,7 @@ function getStudents(){
         contentType: "application/JSON",
         success: function(data){
             $.each(data, function (index, student){
-                addStudentToHTML(student);
+                addStudentToHTMLDOM(student);
             })
         },
         error: function (data){
@@ -51,8 +48,9 @@ function createStudentObject(supervisorId, supervisorName, studentName, studentE
 }
 
 function createStudent(){
-    let studentObject = createStudentObject($("#supervisorIdSelected").val(), $("#supervisorIdSelected option:selected").text(),
-                        $("#studentName1").val(), $("#studentEmail1").val());
+    let studentObject = createStudentObject($("#supervisorIdSelected").val(),
+                        $("#supervisorIdSelected option:selected").text(),
+                        $("#studentNameInputField").val(), $("#studentEmailInputField").val());
     console.log(studentObject);
     $.ajax({
         url:"/api/createStudent",
@@ -60,7 +58,7 @@ function createStudent(){
         contentType: "application/JSON",
         data: JSON.stringify(studentObject),
         success: function(data){
-            addStudentToHTML(data);
+            addStudentToHTMLDOM(data);
         },
         error: function (){
             console.log("Error in response from server on createStudent");
@@ -68,12 +66,12 @@ function createStudent(){
     })
 }
 
-function deleteStudent(id){
+function deleteStudent(studentId){
     $.ajax({
-        url:"api/deleteStudent/" + id,
+        url:"api/deleteStudent/" + studentId,
         method: "DELETE",
         success: function(){
-            $('button[value=' + id + ']').parent().remove();
+            $('button[value=' + studentId + ']').parent().remove();
         },
         error: function (){
             console.log("Error in response from server on deleteStudent");
@@ -81,23 +79,25 @@ function deleteStudent(id){
     })
 }
 
-function updateStudent(id){
-    let studentElement = $('button[value=' + id + ']').parent();
-    let studentObject = createStudentObject(studentElement.children('#supervisorId').children().val(),
-                        studentElement.children('#supervisorName').children().val(),
-                        studentElement.children('#name').children().val(),
-                        studentElement.children('#email').children().val());
-    console.log(studentObject);
+function updateStudent(studentId){
+    let studentElement = $('button[value=' + studentId + ']').parent().children();
+    let studentObject = createStudentObject(
+        studentElement.children('input[name = supervisorId]').val(),
+        studentElement.children('input[name = supervisorName]').val(),
+        studentElement.children('input[name = studentName]').val(),
+        studentElement.children('input[name = studentEmail]').val());
     $.ajax({
-        url:"/api/updateStudent/" + id,
+        url:"/api/updateStudent/" + studentId,
         type: "PUT",
         contentType: "application/JSON",
         data: JSON.stringify(studentObject),
         success: function(data){
-            studentElement.children('#supervisorId').prepend("<h6 id='message'></h6>");
+            studentElement.parent().css("background-color", "palegreen");
+            studentElement.parent().append("<h6 id='message'></h6>");
             $("#message").fadeIn().html("Updated");
             setTimeout(function (){
                 $("#message").remove();
+                studentElement.parent().css("background-color", "");
             }, 1000);
         },
         error: function (){
