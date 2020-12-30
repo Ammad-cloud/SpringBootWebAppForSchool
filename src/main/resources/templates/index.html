@@ -12,16 +12,16 @@
         <table>
             <tr>
                 <td>Full name</td>
-                <td><input type="text" id="studentNameInputField" placeholder="Full Name"></td>
+                <td><input type="text" class="form-control" id="studentNameInputField" placeholder="Full Name"></td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td><input type="text" id="studentEmailInputField" placeholder="Email"></td>
+                <td><input type="text" class="form-control" id="studentEmailInputField" placeholder="Email"></td>
             </tr>
             <tr>
                 <td>Supervisor</td>
                 <td>
-                <select id="supervisorIdSelected">
+                <select class="form-control" id="supervisorIdSelected">
                     <option
                             th:each="supervisor : ${supervisorList}"
                             th:value="${supervisor.id}"
@@ -31,7 +31,7 @@
                 </td>
             </tr>
         </table>
-        <input type="submit" value="Create Student">
+        <input type="submit" value="Create Student" class="btn btn-success">
     </form>
     <table class="table" id="table">
         <thead class="thead">
@@ -39,9 +39,10 @@
         <th>Student Name</th>
         <th>Student Email</th>
         <th>Supervisor</th>
+        <th>Change supervisor</th>
         <th>Delete</th>
         <th>Update</th>
-        <th>Change supervisor</th>
+        <th>Status</th>
         </thead>
     </table>
 </body>

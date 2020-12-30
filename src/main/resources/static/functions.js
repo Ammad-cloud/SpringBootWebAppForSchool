@@ -1,15 +1,15 @@
 function addStudentToHTMLDOM(student){
+    let supervisorOption = $("#supervisorIdSelected").clone().attr('id', "supervisorSelectForStudent" + student.id);
     $('<tr>').append(
-    $("<td type='text' id='studentId' value=" + student.id +  ">").append(student.id), // not used but added to function as a student identifier for convenience purposes in future
-    $("<td><input name='studentName' type='text' value='" + student.name + "'>"), //value is put into string because name can contain whitespace
-    $("<td><input name='studentEmail' type='text' value=" + student.email +  ">"),
-    $("<td name='supervisorName' type='text' value='" + student.supervisor.name +  "'>").append(student.supervisor.name), //supervisor name is put into a string because the name can contain whitespace
-    $("<td><button type='submit' onclick='deleteStudent(this.value)' value=" + student.id + ">" + "Delete</button>"),
-    $("<td><button type='submit' onclick='updateStudent(this.value)' value=" + student.id + ">" + "Update</button>"),
-    $("<input name='supervisorId' type='hidden' value='" + student.supervisor.id +  "'>"),
-    $("#supervisorIdSelected").clone().attr('id', "supervisorSelectForStudent" + student.id) //id changed to avoid id duplicate conflicts.
+    $("<td type='text' id='studentId' value=" + student.id + ">").append(student.id),
+    $("<td><input class='form-control' name='studentName' type='text' value='" + student.name + "'>"), //value is put into string because name can contain whitespace
+    $("<td><input class='form-control' name='studentEmail' type='text' value=" + student.email +  ">"),
+    $("<td name='supervisorName' type='text' value='" + student.supervisor.name +  "'>").append(student.supervisor.name), //value is put into a string because the name can contain whitespace
+    $("<td>").append(supervisorOption.val(student.supervisor.id)),
+    $("<td><button type='submit' class='btn btn-danger' onclick='deleteStudent(this.value)' value=" + student.id + ">" + "Delete</button>"),
+    $("<td><button type='submit' class='btn btn-primary' onclick='updateStudent(this.value)' value=" + student.id + ">" + "Update</button>"),
+    $("<input name='supervisorId' type='hidden' value='" + student.supervisor.id +  "'>")
     ).appendTo('#table');
-
 }
 
 function getStudents(){
@@ -18,8 +18,8 @@ function getStudents(){
         url:"/api/students",
         type: "GET",
         contentType: "application/JSON",
-        success: function(data){
-            $.each(data, function (index, student){
+        success: function(studentSet){
+            $.each(studentSet, function (index, student){
                 addStudentToHTMLDOM(student);
             })
         },
@@ -37,16 +37,14 @@ function preventCreateStudentForSending(form){
 }
 
 function createStudentObject(supervisorId, supervisorName, studentName, studentEmail){
-    let supervisorObject = {
-        id : supervisorId,
-        name : supervisorName
-    }
-    let studentObject = {
-        name : studentName,
-        email : studentEmail,
-        supervisor : supervisorObject
-    }
-    return studentObject;
+    return { //returns a JS object
+        name: studentName,
+        email: studentEmail,
+        supervisor: {
+            id: supervisorId,
+            name: supervisorName
+        }
+    };
 }
 
 function createStudent(){
@@ -59,8 +57,8 @@ function createStudent(){
         type: "POST",
         contentType: "application/JSON",
         data: JSON.stringify(studentObject),
-        success: function(data){
-            addStudentToHTMLDOM(data);
+        success: function(studentObject){
+            addStudentToHTMLDOM(studentObject);
         },
         error: function (){
             console.log("Error in response from server on createStudent");
@@ -102,9 +100,9 @@ function updateStudent(studentId){
 }
 
 function updateTableOnChange(studentRow){
-    studentRow.parent().css("background-color", "palegreen");
-    studentRow.parent().append("<h6 id='message'></h6>");
-    let updatedSupervisorNameValue =  studentRow[7].selectedOptions[0].innerText; //find better solution
+    studentRow.parent().css("background-color", "#ccff66");
+    studentRow.parent().append("<td id='message'></td>");
+    let updatedSupervisorNameValue =  studentRow[4].children[0].selectedOptions[0].innerText; //find better solution
     studentRow.parent().children('td[name= supervisorName]').text(updatedSupervisorNameValue);
     $("#message").fadeIn().html("Updated");
     setTimeout(function (){
